@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
+    // Further reading:
+    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+    url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  name         String
+  lastName     String
+  email        String    @unique
+  phone        String    @unique
+  address      String?
+  passwordHash String
+  image        String
+  comments     Comment[]
+  favourites   Favourit[]
+}
+
+model Comment {
+  id        Int     @id @default(autoincrement())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  post      Post @relation(fields: [postID], references: [id])
+  postID    Int
+  text      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+} 
+
+
+
+model Post{
+    id Int @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    title String
+    price Int
+    popularity Int @default(0)
+    property String
+    imgs Image[]
+    categories Category[]
+    brands Brand[]
+    comments Comment[]
+    favourit Favourit[]
+}
+model Image{
+    id Int @id @default(autoincrement())
+    title String 
+    altTitle String
+    posts Post[]
+}
+
+model Brand{
+    id Int @id @default(autoincrement())
+    title String
+    img String
+    posts Post []
+}
+
+model Category{
+    id Int @id @default(autoincrement())
+    title String 
+    popularity Int @default(0)
+    posts Post []
+    img String
+
+}
+
+model Favourit{
+    id          Int     @id @default(autoincrement())
+    user        User    @relation(fields: [userID], references: [id])
+    userID      Int
+    posts       Post    @relation(fields: [postsID],references: [id])
+    postsID     Int
+}
